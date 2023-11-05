@@ -7,6 +7,9 @@ import theme from "./theme/theme";
 import { RecoilRoot } from "recoil";
 import {eel} from "./eel";
 import { useState } from "react";
+// 追加
+import Emo from './components/emotionEditer'
+
 
 eel.set_host( 'ws://localhost:10001')
 
@@ -49,6 +52,7 @@ const App = () => {
 						<Text>{message}</Text>
 						<Button onClick={pickFile} >Pick Random File From `{path}`</Button>
 						<Router />
+						<Emo/>
 					</RecoilRoot>
 				</ChakraProvider>
 			</BrowserRouter>
