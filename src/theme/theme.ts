@@ -11,6 +11,15 @@ const theme = extendTheme({
 		}
 	},
 	componets: {
+		Button: {
+			variants: {
+				base: {
+					bg: 'yellow.500',
+					fontSize: 'md'
+				},
+			}
+		},
+
 		Divider: {
 			colors: {
 				brand: {
