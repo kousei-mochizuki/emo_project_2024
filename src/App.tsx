@@ -1,6 +1,6 @@
 import "./App.css";
 import theme from "./theme/theme";
-import { ChakraProvider, Flex, Box } from "@chakra-ui/react";
+import { ChakraProvider, Flex, Box, Table, TableContainer, Thead, Tbody, Tr, Th, Td, Heading, Select, Tab, Tabs, TabList, TabPanel, TabPanels } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
 import { Router } from "./router/Router";
 import { Toaster } from "react-hot-toast";
@@ -20,6 +20,8 @@ import "ace-builds/src-noconflict/ext-language_tools"
 
 eel.set_host( 'ws://localhost:10001')
 
+//var pattern = 「」;
+
 // EmotionDataItem インターフェースを追加
 interface EmotionDataItem {
 	id: number;
@@ -30,45 +32,47 @@ interface EmotionDataItem {
 const StackedBarChart: React.FC<{ emotionData: EmotionDataItem[] }> = ({ emotionData }) => {
 	// Check if emotionData is empty or not available
 	if (!emotionData || emotionData.length === 0) {
-	  // Return a placeholder or empty div if no emotion data is available
+	  	// Return a placeholder or empty div if no emotion data is available
 		return <div>No emotion data available.</div>;
-	}
-
-	return (
+		}
+	
+		return (
 		<div>
 			{emotionData.map((dataItem, index) => (
 			<div
 				key={dataItem.id}
-				style={{
-				display: 'flex',
-				justifyContent: 'space-between',
-				marginTop: index > 0 ? '10px' : '0', // Add top margin for all but the first graph
+					style={{
+					display: 'flex',
+					justifyContent: 'space-between',
+					marginTop: dataItem.text.trim() === '' ? '18px' : '0', // Add top margin if text is empty
 				}}
 			>
-				{dataItem.emotion[0] && Object.entries(dataItem.emotion[0]).map(([emotion, value]) => {
-				const cumulativeWidth = Object.values(dataItem.emotion[0])
-					.filter((v) => v > 0.1)
+				{dataItem.emotion[0] &&
+				Object.entries(dataItem.emotion[0]).map(([emotion, value]) => {
+					const cumulativeWidth = Object.values(dataItem.emotion[0])
+					.filter((v) => v > 0.001)
 					.reduce((acc, v) => acc + v, 0);
 	
-				return (
+					const barWidth = (value / cumulativeWidth) * 100;
+	
+					return (
 					<div
-					key={emotion}
-					style={{
-						backgroundColor: getColor(emotion),
-						height: '18px',
-						width: `${(value / cumulativeWidth) * 100}%`,
-						border: '1px solid #fff',
-						position: 'relative',
-					}}
+						key={emotion}
+							style={{
+							backgroundColor: getColor(emotion),
+							height: '19px',
+							width: `${barWidth}%`,
+							border: '1px solid #fff',
+							position: 'relative',
+						}}
 					></div>
-				);
+					);
 				})}
 			</div>
 			))}
 		</div>
 	);
 };
-
 
 // getColor関数にも型を指定
 const getColor = (emotion: string): string => {
@@ -91,6 +95,7 @@ const getColor = (emotion: string): string => {
 			return 'gray';
 	}
 };
+
 
 
 const App: React.FC = () => {
@@ -139,6 +144,37 @@ const App: React.FC = () => {
 					<RecoilRoot>
 						<Toaster position="top-center" reverseOrder={false} />
 						<Router/>
+						<Flex direction="column" align="center">
+							<Flex align="center" justify="space-between" w="100%">
+								<Flex align="center">
+									<Heading size="sm">
+										感情分析アプリ
+									</Heading>
+								</Flex>
+								<Flex align="center">
+									<Select
+										placeholder="character"
+										defaultValue=""
+									>
+										<option value="optionA">オプションA</option>
+										<option value="optionB">オプションB</option>
+										<option value="optionC">オプションC</option>
+									</Select>
+									<Select
+										placeholder="emotion"
+										defaultValue=""
+									>
+										<option value="喜び">joy</option>
+										<option value="期待">Anticipation</option>
+										<option value="驚き">Surprise</option>
+										<option value="悲しみ">Sadness</option>
+										<option value="恐れ">Fear</option>
+										<option value="嫌悪">Disgust</option>
+										<option value="怒り">Anger</option>
+									</Select>
+								</Flex>
+							</Flex>
+						</Flex>
 						<Flex alignItems="flex-start">
 							<Box>
 								<AceEditor
@@ -157,17 +193,55 @@ const App: React.FC = () => {
 									onChange={handleEditorChange} // onChangeプロパティにテキスト変更時のハンドラを指定
 								/>
 							</Box>
-							<Box w="50%">
+							<Box w="40%">
+								{/*<Tabs colorScheme='green'>
+									<TabList>
+										<Tab>Tab 1</Tab>
+										<Tab>Tab 2</Tab>
+									</TabList>
+									<TabPanels>
+										<TabPanel>
+											<p>one!</p>
+										</TabPanel>
+										<TabPanel>
+											<p>two!</p>
+										</TabPanel>
+									</TabPanels>
+								</Tabs>*/}
 								{/* Include the EmotionChart component */}
 								<StackedBarChart emotionData={emotionData} />
 							</Box>
 						</Flex>
-						<div>
-							<div>
-								<h2>感情分析結果:</h2>
-								<a>{JSON.stringify(emotionData, null, 2)}</a>
-							</div>
-						</div>
+						<TableContainer overflowY="auto">
+							<Table variant="striped" colorScheme="teal" size="sm">
+								<Thead>
+									<Tr>
+									<Th>ID</Th>
+									<Th>Text</Th>
+									<Th>Emotion</Th>
+									</Tr>
+								</Thead>
+								<Tbody>
+									{emotionData.map((dataItem) => (
+									<Tr key={dataItem.id}>
+										<Td>{dataItem.id}</Td>
+										<Td whiteSpace="normal">{dataItem.text}</Td>
+										<Td>
+										{dataItem.emotion[0] && (
+											<>
+											{Object.entries(dataItem.emotion[0]).map(
+												([emotion, value]) => (
+												<span key={emotion}>{`${emotion}: ${value.toFixed(3)} `}</span>
+												)
+											)}
+											</>
+										)}
+										</Td>
+									</Tr>
+									))}
+								</Tbody>
+							</Table>
+						</TableContainer>
 					</RecoilRoot>
 				</ChakraProvider>
 			</BrowserRouter>

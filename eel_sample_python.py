@@ -17,7 +17,7 @@ import eel
 
 # Use latest version of Eel from parent directory
 sys.path.insert(1, '../../')
-print(sys.path)
+#print(sys.path)
 
 
 @eel.expose

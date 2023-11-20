@@ -10,7 +10,7 @@ const theme = extendTheme({
 			}
 		}
 	},
-	componets: {
+	components: {
 		Button: {
 			variants: {
 				base: {
