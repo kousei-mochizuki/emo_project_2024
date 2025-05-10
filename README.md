@@ -1,133 +1,34 @@
-# このリポジトリについて
+# emo_project_2024
 
-Python でデスクトップアプリの GUI を React で開発するためのライブラリ eel を使えるようにするためのテンプレート
+![gif](https://github.com/kousei-mochizuki/emo_project_2024/blob/main/images/emopro.gif)
 
-## 利用させていただいた元リポジトリ
+## Overview
 
-[https://github.com/python-eel/Eel](https://github.com/python-eel/Eel)
+入力1行ごとにセリフやト書きを感情分析してくれるアプリケーション。
 
-こちらの examples ディレクトリの 07-CreateReactApp のコードを元にしています
+## Requirement
 
-App.tsx などがクラスコンポーネントだったので関数コンポーネントに変更
-
-また自分用に ChakraUI や Recoil が使えるようになっています（この文章を執筆時点でこの環境でそれらが正常に動作するかは確認できておりません。ChakraUI のコンポーネントは使えてるから多分大丈夫なはず）
-
-vsCode でコード整形できるように eslint と prettier も設定しています
-
-## 環境
-
-Python3 ver9.13
-
-git version 2.37.1.windows.1
-
-npm 8.19.2
-
-node.js v16.18.0
-
-react 17.0.2
-
-**※anaconda などで Python を入れている場合動作確認しておりません。使えない可能性があります。**
-
-## How to use
-
-### Python で仮想環境でプロジェクトを作る
-
-- projectEnvs などのディレクトリを任意の場所に作ってそこをカレントディレクトリにし、python コマンドで仮想環境を作る
-
+python環境構築
 ```
-cd C:\Users\［******］\Py_workSpace\projectEnvs
-
 python -m venv [プロジェクト名]
-```
 
-- 出来上がったプロジェクトフォルダに移動、仮想環境に入ってライブラリをインストール
-
-```
-cd ./[プロジェクトディレクトリ]
-
+cd C:\Users\［******］\Py_workSpace\projectEnvs
 .\Scripts\Activate.ps1　　//このコマンドで仮想環境に入れる(Powershellの場合)
-
 .\Scripts\activate.bat    //コマンドプロンプトの場合はbatファイルの方を指定
-
-(sample_eel) PS C:\Users\［*******］\Py_workSpace\projectEnvs\sample_eel>
-//表示がこのようになっていれば仮想環境に入れています
-
-pip install bottle bottle-websocket future whichcraft eel pyinstaller
+pip install requirements.txt
 ```
-
-### このリポジトリをプロジェクト内に Clone して利用する
-
-- プロジェクト内に新しく web ディレクトリを作成してその中に Clone
-  ディレクトリは空じゃないとエラーが出ます。
-
-```
-cd C:\Users\［*******］\Py_workSpace\projectEnvs\sample_eel>web
-
-git clone [リポジトリURL] .
-//既存の空のディレクトリにCloneするため最後は「.」
-```
-
-- 追跡リポジトリをプロジェクトで使用するものに変更
-  変更できてるかの確認は`git remote -v`
-
-```
-git remote set-url origin [新しいプロジェクトのリポジトリURL]
-
-git pull origin
-```
-
-- カレントディレクトリにて npm インストールとビルド
-  ChakraUI や recoil やらのライブラリを元から使っているので、packagejson を確認して使用しないものは削除してください
-
-```
-npm install　//ライブラリのインストール
-
-npm run build　//index.htmlのビルド
-
-git add .
-
-git commit -m "コミットメッセージ"
-
-git push origin main
-```
-
-### 動作を確認
-
-- 通常起動
-
-```
-Python .\eel_sample_python.py
-```
-
-React の index.html の画面が立ち上がれば OK
-
-この場合はビルド後の index.html を読み込んでいます
-
-- Develop 起動
-  Powershell を二つ起動しそれぞれで別のコマンドを打つ
-
-```
-Python .\eel_sample_python.py true   //trueの引数をつけてPythonファイルを起動
 ```
 
 ```
-npm start
-```
 
-localhost3000 で先ほどと同じように起動すれば成功
+## Usage
 
-こちらは Public 下の index.html を読み込んでいるので編集すると画面に反映されます
+左側のテキストエリアに入力を行うことで右側にその文に対する感情の割合を表示する。
+それぞれの色が表す感情は以下の画像の通り。
+![png](https://github.com/kousei-mochizuki/emo_project_2024/blob/main/images/graph.png)
 
-### 実行ファイル作成
+## Reference
 
-```
-python -m eel eel_sample_python.py build --onefile --name react-eel-app
-```
-
-react-eel-app はファイル名なので自由に変更してください
-
-dist ディレクトリが新しく生成されてその直下に exe ファイルができています
-
-ダブルクリックするとアプリが起動します
-
-web ディレクトリごとデスクトップにコピーして起動しても動作したので、このファイルを渡せば Python 環境がない PC でも利用できます
+- [Python＋eelでReactを使ってGUI開発(テンプレ)](https://qiita.com/dende-h/items/19fb0d461c5dc41105ff)
+- [dende-h / sample_eel](https://github.com/dende-h/sample_eel)
+- [Hugging Face + WRIMEデータセットで、8クラスの感情分類](https://qiita.com/izaki_shin/items/2b4573ee7fbea5ec8ed6)
