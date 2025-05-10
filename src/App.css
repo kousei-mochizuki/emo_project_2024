@@ -7,24 +7,6 @@
   pointer-events: none;
 }
 
-.emotion-bar {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.emotion-bar div {
-  border-radius: 4px;
-}
-
-.emotion-bar > div:first-child {
-  height: 20px;
-}
-
-.emotion-label {
-  margin-left: 8px;
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

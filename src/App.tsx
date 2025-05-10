@@ -1,30 +1,24 @@
 import "./App.css";
-import theme from "./theme/theme";
-import { ChakraProvider, Flex, Box, Table, TableContainer, Thead, Tbody, Tr, Th, Td, Heading, Select, Tab, Tabs, TabList, TabPanel, TabPanels } from "@chakra-ui/react";
+import { ChakraProvider, Flex, Box, Heading, Table, TableContainer, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
 import { Router } from "./router/Router";
 import { Toaster } from "react-hot-toast";
+import theme from "./theme/theme";
 import { RecoilRoot } from "recoil";
 import { eel } from "./eel";
 import { useState } from "react";
 
-///
 import AceEditor from "react-ace";
-
 import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/theme-monokai";
-import "ace-builds/src-noconflict/ext-language_tools"
-///
-
-
+import "ace-builds/src-noconflict/ext-language_tools";
 
 eel.set_host( 'ws://localhost:10001')
-
-//var pattern = 「」;
 
 // EmotionDataItem インターフェースを追加
 interface EmotionDataItem {
 	id: number;
+	character: string;
 	text: string;
 	emotion: { [key: string]: number }[];
 }
@@ -44,13 +38,13 @@ const StackedBarChart: React.FC<{ emotionData: EmotionDataItem[] }> = ({ emotion
 					style={{
 					display: 'flex',
 					justifyContent: 'space-between',
-					marginTop: dataItem.text.trim() === '' ? '18px' : '0', // Add top margin if text is empty
+					marginTop: dataItem.text.trim() === '' ? '19px' : '0', // Add top margin if text is empty
 				}}
 			>
 				{dataItem.emotion[0] &&
 				Object.entries(dataItem.emotion[0]).map(([emotion, value]) => {
 					const cumulativeWidth = Object.values(dataItem.emotion[0])
-					.filter((v) => v > 0.001)
+					.filter((v) => v > -0.1)
 					.reduce((acc, v) => acc + v, 0);
 	
 					const barWidth = (value / cumulativeWidth) * 100;
@@ -62,7 +56,7 @@ const StackedBarChart: React.FC<{ emotionData: EmotionDataItem[] }> = ({ emotion
 							backgroundColor: getColor(emotion),
 							height: '19px',
 							width: `${barWidth}%`,
-							border: '1px solid #fff',
+							border: '1px solid #272822',
 							position: 'relative',
 						}}
 					></div>
@@ -78,19 +72,21 @@ const StackedBarChart: React.FC<{ emotionData: EmotionDataItem[] }> = ({ emotion
 const getColor = (emotion: string): string => {
 	switch (emotion) {
 		case '喜び':
-			return 'green';
+			return '#FFFF00';
+		case '信頼':
+			return '#54FF54';
 		case '期待':
-			return 'blue';
+			return '#FFC000';
 		case '驚き':
-			return 'orange';
+			return '#00B0F0';
 		case '悲しみ':
-			return 'purple';
+			return '#6666FF';
 		case '恐れ':
-			return 'brown';
+			return '#00B050';
 		case '嫌悪':
-			return 'pink';
+			return '#FF66FF';
 		case '怒り':
-			return 'red';
+			return '#FF0000';
 		default:
 			return 'gray';
 	}
@@ -106,34 +102,39 @@ const App: React.FC = () => {
 	// AceEditorのテキストが変更されたときに実行される関数
 	const handleEditorChange = (newText: string) => {
 		setEditorValue(newText);
-		
-			// Check if the text is empty
-			const trimmedText = newText.trim();
-			if (!trimmedText) {
+	
+		// Check if the text is empty
+		const trimmedText = newText.trim();
+		if (!trimmedText) {
 			// If text is empty, create empty emotion data to maintain graph spacing
-			setEmotionData([{ id: 1, text: "", emotion: [{}] }]);
+			setEmotionData([{ id: 1, character:"", text: "", emotion: [{}] }]);
 			return; // Skip emotion analysis if the text is empty
-			}
-		
-			// Perform emotion analysis only when there is non-empty text
-			const lines = trimmedText.split("\n");
-			const idTextPairs = lines.map((line, index) => ({ id: index + 1, text: line }));
-		
-			eel.analyze_emotion(idTextPairs)((data: string) => {
-			console.log("Received data:", data);
-		
-			try {
-				const parsedData = JSON.parse(data);
-				setEmotionData(parsedData);
-				console.log("Parse:", parsedData);
-			} catch (error) {
-				console.error("Error parsing JSON:", error);
-			}
-			});
-		
+		}
+	
+		// Perform emotion analysis only when there is non-empty text
+		const lines = trimmedText.split("\n");
+		const emotionData: EmotionDataItem[] = lines.map((line, index) => {
+			const match = line.match(/^(.+?)「(.+?)」$/); // Use regular expression to extract character and text
+			const character = match ? match[1] : ""; // Extract character
+			const text = match ? match[2] : ""; // Extract text
+			
+			return { id: index + 1, character, text, emotion: [{}] }; // Add character to the data
+		});
+	
+		eel.analyze_emotion(emotionData)((data: string) => {
+		console.log("Received data:", data);
+	
+		try {
+			const parsedData = JSON.parse(data);
+			setEmotionData(parsedData);
+			console.log("Parse:", parsedData);
+		} catch (error) {
+			console.error("Error parsing JSON:", error);
+		}
+		});
+	
 		console.log("Value:", newText);
 	};
-
 
 
 
@@ -151,35 +152,15 @@ const App: React.FC = () => {
 										感情分析アプリ
 									</Heading>
 								</Flex>
-								<Flex align="center">
-									<Select
-										placeholder="character"
-										defaultValue=""
-									>
-										<option value="optionA">オプションA</option>
-										<option value="optionB">オプションB</option>
-										<option value="optionC">オプションC</option>
-									</Select>
-									<Select
-										placeholder="emotion"
-										defaultValue=""
-									>
-										<option value="喜び">joy</option>
-										<option value="期待">Anticipation</option>
-										<option value="驚き">Surprise</option>
-										<option value="悲しみ">Sadness</option>
-										<option value="恐れ">Fear</option>
-										<option value="嫌悪">Disgust</option>
-										<option value="怒り">Anger</option>
-									</Select>
-								</Flex>
 							</Flex>
 						</Flex>
+
 						<Flex alignItems="flex-start">
 							<Box>
 								<AceEditor
 									placeholder="Placeholder Text"
-									height="80vh"
+									height="100vh"
+									width="50vw"
 									value={editorValue}
 									mode="javascript"
 									theme="monokai"
@@ -193,21 +174,7 @@ const App: React.FC = () => {
 									onChange={handleEditorChange} // onChangeプロパティにテキスト変更時のハンドラを指定
 								/>
 							</Box>
-							<Box w="40%">
-								{/*<Tabs colorScheme='green'>
-									<TabList>
-										<Tab>Tab 1</Tab>
-										<Tab>Tab 2</Tab>
-									</TabList>
-									<TabPanels>
-										<TabPanel>
-											<p>one!</p>
-										</TabPanel>
-										<TabPanel>
-											<p>two!</p>
-										</TabPanel>
-									</TabPanels>
-								</Tabs>*/}
+							<Box w="45%">
 								{/* Include the EmotionChart component */}
 								<StackedBarChart emotionData={emotionData} />
 							</Box>
@@ -215,30 +182,32 @@ const App: React.FC = () => {
 						<TableContainer overflowY="auto">
 							<Table variant="striped" colorScheme="teal" size="sm">
 								<Thead>
-									<Tr>
+								<Tr>
 									<Th>ID</Th>
+									<Th>Character</Th>
 									<Th>Text</Th>
 									<Th>Emotion</Th>
-									</Tr>
+								</Tr>
 								</Thead>
 								<Tbody>
-									{emotionData.map((dataItem) => (
+								{emotionData.map((dataItem) => (
 									<Tr key={dataItem.id}>
-										<Td>{dataItem.id}</Td>
-										<Td whiteSpace="normal">{dataItem.text}</Td>
-										<Td>
+									<Td>{dataItem.id}</Td>
+									<Td whiteSpace="normal">{dataItem.character}</Td>
+									<Td whiteSpace="normal">{dataItem.text}</Td>
+									<Td>
 										{dataItem.emotion[0] && (
-											<>
+										<>
 											{Object.entries(dataItem.emotion[0]).map(
-												([emotion, value]) => (
-												<span key={emotion}>{`${emotion}: ${value.toFixed(3)} `}</span>
-												)
+											([emotion, value]) => (
+												<span key={emotion}>{`${value.toFixed(6)} `}</span>
+											)
 											)}
-											</>
+										</>
 										)}
-										</Td>
+									</Td>
 									</Tr>
-									))}
+								))}
 								</Tbody>
 							</Table>
 						</TableContainer>

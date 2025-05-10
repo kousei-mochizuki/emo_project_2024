@@ -34,6 +34,6 @@
   "rules": {
     "react/display-name": "off",
     "react-hooks/exhaustive-deps": "off",
-    "react/prop-types": "off" // react/prop-types ルールを無効化
+    "react/prop-types": "off"
   }
 }

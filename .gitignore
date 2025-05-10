@@ -23,4 +23,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-src/models
+.spec
+src/models_230316.zip
+src/models/__init__.py
+src/models/config.json
+src/models/model.safetensors
+src/models/special_tokens_map.json
+src/models/tokenizer_config.json
+src/models/vocab.txt

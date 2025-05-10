@@ -80,7 +80,7 @@ git pull origin
   ChakraUI や recoil やらのライブラリを元から使っているので、packagejson を確認して使用しないものは削除してください
 
 ```
-nmp install　//ライブラリのインストール
+npm install　//ライブラリのインストール
 
 npm run build　//index.htmlのビルド
 
